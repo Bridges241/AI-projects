@@ -59,19 +59,17 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getIncomeRecords(userId: string, startDate?: string, endDate?: string): Promise<IncomeRecord[]> {
-    let query = db.select().from(incomeRecords).where(eq(incomeRecords.userId, userId));
-    
     if (startDate && endDate) {
-      query = query.where(
+      return db.select().from(incomeRecords).where(
         and(
           eq(incomeRecords.userId, userId),
           gte(incomeRecords.date, startDate),
           lte(incomeRecords.date, endDate)
         )
-      );
+      ).orderBy(desc(incomeRecords.date));
     }
     
-    return query.orderBy(desc(incomeRecords.date));
+    return db.select().from(incomeRecords).where(eq(incomeRecords.userId, userId)).orderBy(desc(incomeRecords.date));
   }
 
   async createIncomeRecord(userId: string, record: InsertIncomeRecord): Promise<IncomeRecord> {
@@ -95,23 +93,21 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .delete(incomeRecords)
       .where(and(eq(incomeRecords.id, id), eq(incomeRecords.userId, userId)));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 
   async getExpenseRecords(userId: string, startDate?: string, endDate?: string): Promise<ExpenseRecord[]> {
-    let query = db.select().from(expenseRecords).where(eq(expenseRecords.userId, userId));
-    
     if (startDate && endDate) {
-      query = query.where(
+      return db.select().from(expenseRecords).where(
         and(
           eq(expenseRecords.userId, userId),
           gte(expenseRecords.date, startDate),
           lte(expenseRecords.date, endDate)
         )
-      );
+      ).orderBy(desc(expenseRecords.date));
     }
     
-    return query.orderBy(desc(expenseRecords.date));
+    return db.select().from(expenseRecords).where(eq(expenseRecords.userId, userId)).orderBy(desc(expenseRecords.date));
   }
 
   async createExpenseRecord(userId: string, record: InsertExpenseRecord): Promise<ExpenseRecord> {
@@ -135,7 +131,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .delete(expenseRecords)
       .where(and(eq(expenseRecords.id, id), eq(expenseRecords.userId, userId)));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 
   async getBudgets(userId: string): Promise<Budget[]> {
@@ -163,7 +159,7 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .delete(budgets)
       .where(and(eq(budgets.id, id), eq(budgets.userId, userId)));
-    return result.rowCount > 0;
+    return (result.rowCount || 0) > 0;
   }
 }
 

@@ -4,8 +4,15 @@ interface OverviewCardsProps {
   timeRange: string;
 }
 
+interface SummaryData {
+  totalIncome: number;
+  totalExpenses: number;
+  netIncome: number;
+  savingsRate: number;
+}
+
 export default function OverviewCards({ timeRange }: OverviewCardsProps) {
-  const { data: summary } = useQuery({
+  const { data: summary } = useQuery<SummaryData>({
     queryKey: ["/api/analysis/summary"],
     staleTime: 30000,
   });
