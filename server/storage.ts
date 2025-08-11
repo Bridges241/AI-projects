@@ -1,0 +1,170 @@
+import { 
+  users, 
+  incomeRecords, 
+  expenseRecords, 
+  budgets,
+  type User, 
+  type InsertUser,
+  type IncomeRecord,
+  type InsertIncomeRecord,
+  type ExpenseRecord,
+  type InsertExpenseRecord,
+  type Budget,
+  type InsertBudget
+} from "@shared/schema";
+import { db } from "./db";
+import { eq, and, gte, lte, desc } from "drizzle-orm";
+
+export interface IStorage {
+  getUser(id: string): Promise<User | undefined>;
+  getUserByUsername(username: string): Promise<User | undefined>;
+  createUser(user: InsertUser): Promise<User>;
+  
+  // Income operations
+  getIncomeRecords(userId: string, startDate?: string, endDate?: string): Promise<IncomeRecord[]>;
+  createIncomeRecord(userId: string, record: InsertIncomeRecord): Promise<IncomeRecord>;
+  updateIncomeRecord(id: string, userId: string, record: Partial<InsertIncomeRecord>): Promise<IncomeRecord | undefined>;
+  deleteIncomeRecord(id: string, userId: string): Promise<boolean>;
+  
+  // Expense operations
+  getExpenseRecords(userId: string, startDate?: string, endDate?: string): Promise<ExpenseRecord[]>;
+  createExpenseRecord(userId: string, record: InsertExpenseRecord): Promise<ExpenseRecord>;
+  updateExpenseRecord(id: string, userId: string, record: Partial<InsertExpenseRecord>): Promise<ExpenseRecord | undefined>;
+  deleteExpenseRecord(id: string, userId: string): Promise<boolean>;
+  
+  // Budget operations
+  getBudgets(userId: string): Promise<Budget[]>;
+  createBudget(userId: string, budget: InsertBudget): Promise<Budget>;
+  updateBudget(id: string, userId: string, budget: Partial<InsertBudget>): Promise<Budget | undefined>;
+  deleteBudget(id: string, userId: string): Promise<boolean>;
+}
+
+export class DatabaseStorage implements IStorage {
+  async getUser(id: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.id, id));
+    return user || undefined;
+  }
+
+  async getUserByUsername(username: string): Promise<User | undefined> {
+    const [user] = await db.select().from(users).where(eq(users.username, username));
+    return user || undefined;
+  }
+
+  async createUser(insertUser: InsertUser): Promise<User> {
+    const [user] = await db
+      .insert(users)
+      .values(insertUser)
+      .returning();
+    return user;
+  }
+
+  async getIncomeRecords(userId: string, startDate?: string, endDate?: string): Promise<IncomeRecord[]> {
+    let query = db.select().from(incomeRecords).where(eq(incomeRecords.userId, userId));
+    
+    if (startDate && endDate) {
+      query = query.where(
+        and(
+          eq(incomeRecords.userId, userId),
+          gte(incomeRecords.date, startDate),
+          lte(incomeRecords.date, endDate)
+        )
+      );
+    }
+    
+    return query.orderBy(desc(incomeRecords.date));
+  }
+
+  async createIncomeRecord(userId: string, record: InsertIncomeRecord): Promise<IncomeRecord> {
+    const [created] = await db
+      .insert(incomeRecords)
+      .values({ ...record, userId })
+      .returning();
+    return created;
+  }
+
+  async updateIncomeRecord(id: string, userId: string, record: Partial<InsertIncomeRecord>): Promise<IncomeRecord | undefined> {
+    const [updated] = await db
+      .update(incomeRecords)
+      .set(record)
+      .where(and(eq(incomeRecords.id, id), eq(incomeRecords.userId, userId)))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteIncomeRecord(id: string, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(incomeRecords)
+      .where(and(eq(incomeRecords.id, id), eq(incomeRecords.userId, userId)));
+    return result.rowCount > 0;
+  }
+
+  async getExpenseRecords(userId: string, startDate?: string, endDate?: string): Promise<ExpenseRecord[]> {
+    let query = db.select().from(expenseRecords).where(eq(expenseRecords.userId, userId));
+    
+    if (startDate && endDate) {
+      query = query.where(
+        and(
+          eq(expenseRecords.userId, userId),
+          gte(expenseRecords.date, startDate),
+          lte(expenseRecords.date, endDate)
+        )
+      );
+    }
+    
+    return query.orderBy(desc(expenseRecords.date));
+  }
+
+  async createExpenseRecord(userId: string, record: InsertExpenseRecord): Promise<ExpenseRecord> {
+    const [created] = await db
+      .insert(expenseRecords)
+      .values({ ...record, userId })
+      .returning();
+    return created;
+  }
+
+  async updateExpenseRecord(id: string, userId: string, record: Partial<InsertExpenseRecord>): Promise<ExpenseRecord | undefined> {
+    const [updated] = await db
+      .update(expenseRecords)
+      .set(record)
+      .where(and(eq(expenseRecords.id, id), eq(expenseRecords.userId, userId)))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteExpenseRecord(id: string, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(expenseRecords)
+      .where(and(eq(expenseRecords.id, id), eq(expenseRecords.userId, userId)));
+    return result.rowCount > 0;
+  }
+
+  async getBudgets(userId: string): Promise<Budget[]> {
+    return db.select().from(budgets).where(eq(budgets.userId, userId));
+  }
+
+  async createBudget(userId: string, budget: InsertBudget): Promise<Budget> {
+    const [created] = await db
+      .insert(budgets)
+      .values({ ...budget, userId })
+      .returning();
+    return created;
+  }
+
+  async updateBudget(id: string, userId: string, budget: Partial<InsertBudget>): Promise<Budget | undefined> {
+    const [updated] = await db
+      .update(budgets)
+      .set(budget)
+      .where(and(eq(budgets.id, id), eq(budgets.userId, userId)))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteBudget(id: string, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(budgets)
+      .where(and(eq(budgets.id, id), eq(budgets.userId, userId)));
+    return result.rowCount > 0;
+  }
+}
+
+export const storage = new DatabaseStorage();
