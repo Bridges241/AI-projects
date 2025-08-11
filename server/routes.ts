@@ -1,7 +1,13 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertIncomeRecordSchema, insertExpenseRecordSchema, insertBudgetSchema } from "@shared/schema";
+import { 
+  insertIncomeRecordSchema, 
+  insertExpenseRecordSchema, 
+  insertBudgetSchema,
+  insertEntrepreneurshipProjectSchema,
+  insertProjectFinancialRecordSchema
+} from "@shared/schema";
 
 export async function registerRoutes(app: Express): Promise<Server> {
   const DEMO_USER_ID = "demo-user-id";
@@ -179,6 +185,110 @@ export async function registerRoutes(app: Express): Promise<Server> {
       });
     } catch (error) {
       res.status(500).json({ error: "Failed to calculate financial summary" });
+    }
+  });
+
+  // Entrepreneurship Project routes
+  app.get("/api/entrepreneurship/projects", async (req, res) => {
+    try {
+      const projects = await storage.getEntrepreneurshipProjects(DEMO_USER_ID);
+      res.json(projects);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch entrepreneurship projects" });
+    }
+  });
+
+  app.post("/api/entrepreneurship/projects", async (req, res) => {
+    try {
+      const data = insertEntrepreneurshipProjectSchema.parse(req.body);
+      const project = await storage.createEntrepreneurshipProject(DEMO_USER_ID, data);
+      res.json(project);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid project data" });
+    }
+  });
+
+  app.put("/api/entrepreneurship/projects/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const data = insertEntrepreneurshipProjectSchema.partial().parse(req.body);
+      const project = await storage.updateEntrepreneurshipProject(id, DEMO_USER_ID, data);
+      if (!project) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      res.json(project);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid project data" });
+    }
+  });
+
+  app.delete("/api/entrepreneurship/projects/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deleteEntrepreneurshipProject(id, DEMO_USER_ID);
+      if (!success) {
+        return res.status(404).json({ error: "Project not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete project" });
+    }
+  });
+
+  // Project Financial Record routes
+  app.get("/api/entrepreneurship/projects/:projectId/records", async (req, res) => {
+    try {
+      const { projectId } = req.params;
+      const { startDate, endDate } = req.query;
+      const records = await storage.getProjectFinancialRecords(
+        projectId,
+        startDate as string,
+        endDate as string
+      );
+      res.json(records);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch project financial records" });
+    }
+  });
+
+  app.post("/api/entrepreneurship/projects/:projectId/records", async (req, res) => {
+    try {
+      const { projectId } = req.params;
+      const data = insertProjectFinancialRecordSchema.parse({
+        ...req.body,
+        projectId
+      });
+      const record = await storage.createProjectFinancialRecord(data);
+      res.json(record);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid financial record data" });
+    }
+  });
+
+  app.put("/api/entrepreneurship/records/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const data = insertProjectFinancialRecordSchema.partial().parse(req.body);
+      const record = await storage.updateProjectFinancialRecord(id, data);
+      if (!record) {
+        return res.status(404).json({ error: "Financial record not found" });
+      }
+      res.json(record);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid financial record data" });
+    }
+  });
+
+  app.delete("/api/entrepreneurship/records/:id", async (req, res) => {
+    try {
+      const { id } = req.params;
+      const success = await storage.deleteProjectFinancialRecord(id);
+      if (!success) {
+        return res.status(404).json({ error: "Financial record not found" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete financial record" });
     }
   });
 

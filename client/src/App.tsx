@@ -8,6 +8,7 @@ import IncomePage from "@/pages/income";
 import ExpensesPage from "@/pages/expenses";
 import AnalysisPage from "@/pages/analysis";
 import LoanPage from "@/pages/loan";
+import EntrepreneurshipPage from "@/pages/entrepreneurship";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -18,6 +19,7 @@ function Router() {
       <Route path="/expenses" component={ExpensesPage} />
       <Route path="/analysis" component={AnalysisPage} />
       <Route path="/loan" component={LoanPage} />
+      <Route path="/entrepreneurship" component={EntrepreneurshipPage} />
       <Route component={NotFound} />
     </Switch>
   );

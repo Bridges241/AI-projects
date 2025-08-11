@@ -21,7 +21,7 @@ export default function Dashboard() {
         {/* Header */}
         <header className="bg-white shadow-sm border-b border-slate-200 p-6">
           <div className="flex justify-between items-center">
-            <h2 className="text-2xl font-semibold text-slate-800">財務總覽</h2>
+            <h2 className="text-2xl font-semibold text-slate-800">52系統 - 財務總覽</h2>
             <div className="flex items-center space-x-4">
               <select 
                 className="border border-slate-300 rounded-lg px-3 py-2 text-sm"

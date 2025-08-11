@@ -1,8 +1,8 @@
-# Financial Planning System
+# 52系統 (52 System)
 
 ## Overview
 
-This is a full-stack personal financial management application built with React, Express, and PostgreSQL. The system enables users to track income, expenses, and budgets through an intuitive dashboard interface. It features a modern UI built with shadcn/ui components and provides comprehensive financial analytics including loan assessment capabilities. The application is designed as a single-page application with a RESTful API backend and supports real-time data visualization through charts and graphs.
+This is a full-stack personal financial management application called "52系統" built with React, Express, and PostgreSQL. The system enables users to track income from three modules (salary, investment, entrepreneurship) to evaluate mortgage capability and living expenses. It features a dual-track design comparing planned vs actual financial performance with time-based analysis. The application provides comprehensive financial analytics, loan assessment capabilities, and entrepreneurship project management with accounting profit & loss statement format.
 
 ## User Preferences
 
@@ -35,10 +35,12 @@ Preferred communication style: Simple, everyday language.
 
 ### Database Schema Design
 - **Users Table**: Basic user authentication structure
-- **Income Records**: Categorized income tracking with types (salary, investment, business)
-- **Expense Records**: Detailed expense tracking with categories and descriptions
+- **Income Records**: Categorized income tracking with types (salary, investment, business) and dual-track support (planned vs actual)
+- **Expense Records**: Detailed expense tracking with categories and descriptions with dual-track support (planned vs actual)
 - **Budgets**: Budget management with period-based allocation
-- **Relationships**: Foreign key relationships linking all financial data to users
+- **Entrepreneurship Projects**: Custom project management for entrepreneurship ventures
+- **Project Financial Records**: Accounting P&L statement format for project financial tracking with dual-track support
+- **Relationships**: Foreign key relationships linking all financial data to users and projects
 
 ### Authentication & Authorization
 - **Demo Mode**: Currently uses a hardcoded demo user ID for development

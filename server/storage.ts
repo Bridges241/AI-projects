@@ -3,6 +3,8 @@ import {
   incomeRecords, 
   expenseRecords, 
   budgets,
+  entrepreneurshipProjects,
+  projectFinancialRecords,
   type User, 
   type InsertUser,
   type IncomeRecord,
@@ -10,7 +12,11 @@ import {
   type ExpenseRecord,
   type InsertExpenseRecord,
   type Budget,
-  type InsertBudget
+  type InsertBudget,
+  type EntrepreneurshipProject,
+  type InsertEntrepreneurshipProject,
+  type ProjectFinancialRecord,
+  type InsertProjectFinancialRecord
 } from "@shared/schema";
 import { db } from "./db";
 import { eq, and, gte, lte, desc } from "drizzle-orm";
@@ -37,6 +43,18 @@ export interface IStorage {
   createBudget(userId: string, budget: InsertBudget): Promise<Budget>;
   updateBudget(id: string, userId: string, budget: Partial<InsertBudget>): Promise<Budget | undefined>;
   deleteBudget(id: string, userId: string): Promise<boolean>;
+  
+  // Entrepreneurship Project operations
+  getEntrepreneurshipProjects(userId: string): Promise<EntrepreneurshipProject[]>;
+  createEntrepreneurshipProject(userId: string, project: InsertEntrepreneurshipProject): Promise<EntrepreneurshipProject>;
+  updateEntrepreneurshipProject(id: string, userId: string, project: Partial<InsertEntrepreneurshipProject>): Promise<EntrepreneurshipProject | undefined>;
+  deleteEntrepreneurshipProject(id: string, userId: string): Promise<boolean>;
+  
+  // Project Financial Record operations
+  getProjectFinancialRecords(projectId: string, startDate?: string, endDate?: string): Promise<ProjectFinancialRecord[]>;
+  createProjectFinancialRecord(record: InsertProjectFinancialRecord): Promise<ProjectFinancialRecord>;
+  updateProjectFinancialRecord(id: string, record: Partial<InsertProjectFinancialRecord>): Promise<ProjectFinancialRecord | undefined>;
+  deleteProjectFinancialRecord(id: string): Promise<boolean>;
 }
 
 export class DatabaseStorage implements IStorage {
@@ -159,6 +177,74 @@ export class DatabaseStorage implements IStorage {
     const result = await db
       .delete(budgets)
       .where(and(eq(budgets.id, id), eq(budgets.userId, userId)));
+    return (result.rowCount || 0) > 0;
+  }
+
+  // Entrepreneurship Project operations
+  async getEntrepreneurshipProjects(userId: string): Promise<EntrepreneurshipProject[]> {
+    return db.select().from(entrepreneurshipProjects).where(eq(entrepreneurshipProjects.userId, userId));
+  }
+
+  async createEntrepreneurshipProject(userId: string, project: InsertEntrepreneurshipProject): Promise<EntrepreneurshipProject> {
+    const [created] = await db
+      .insert(entrepreneurshipProjects)
+      .values({ ...project, userId })
+      .returning();
+    return created;
+  }
+
+  async updateEntrepreneurshipProject(id: string, userId: string, project: Partial<InsertEntrepreneurshipProject>): Promise<EntrepreneurshipProject | undefined> {
+    const [updated] = await db
+      .update(entrepreneurshipProjects)
+      .set(project)
+      .where(and(eq(entrepreneurshipProjects.id, id), eq(entrepreneurshipProjects.userId, userId)))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteEntrepreneurshipProject(id: string, userId: string): Promise<boolean> {
+    const result = await db
+      .delete(entrepreneurshipProjects)
+      .where(and(eq(entrepreneurshipProjects.id, id), eq(entrepreneurshipProjects.userId, userId)));
+    return (result.rowCount || 0) > 0;
+  }
+
+  // Project Financial Record operations
+  async getProjectFinancialRecords(projectId: string, startDate?: string, endDate?: string): Promise<ProjectFinancialRecord[]> {
+    if (startDate && endDate) {
+      return db.select().from(projectFinancialRecords).where(
+        and(
+          eq(projectFinancialRecords.projectId, projectId),
+          gte(projectFinancialRecords.date, startDate),
+          lte(projectFinancialRecords.date, endDate)
+        )
+      ).orderBy(desc(projectFinancialRecords.date));
+    }
+    
+    return db.select().from(projectFinancialRecords).where(eq(projectFinancialRecords.projectId, projectId)).orderBy(desc(projectFinancialRecords.date));
+  }
+
+  async createProjectFinancialRecord(record: InsertProjectFinancialRecord): Promise<ProjectFinancialRecord> {
+    const [created] = await db
+      .insert(projectFinancialRecords)
+      .values(record)
+      .returning();
+    return created;
+  }
+
+  async updateProjectFinancialRecord(id: string, record: Partial<InsertProjectFinancialRecord>): Promise<ProjectFinancialRecord | undefined> {
+    const [updated] = await db
+      .update(projectFinancialRecords)
+      .set(record)
+      .where(eq(projectFinancialRecords.id, id))
+      .returning();
+    return updated || undefined;
+  }
+
+  async deleteProjectFinancialRecord(id: string): Promise<boolean> {
+    const result = await db
+      .delete(projectFinancialRecords)
+      .where(eq(projectFinancialRecords.id, id));
     return (result.rowCount || 0) > 0;
   }
 }

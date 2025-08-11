@@ -9,6 +9,7 @@ export default function Sidebar() {
     { href: "/expenses", icon: "fas fa-credit-card", label: "支出管理" },
     { href: "/analysis", icon: "fas fa-chart-bar", label: "財務分析" },
     { href: "/loan", icon: "fas fa-home", label: "貸款評估" },
+    { href: "/entrepreneurship", icon: "fas fa-rocket", label: "創業管理" },
   ];
 
   return (
@@ -16,7 +17,7 @@ export default function Sidebar() {
       <div className="p-6 border-b border-slate-200">
         <h1 className="text-xl font-bold text-slate-800">
           <i className="fas fa-chart-line text-primary mr-2"></i>
-          理財規劃系統
+          52系統
         </h1>
       </div>
       <nav className="p-4">
