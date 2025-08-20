@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>個人理財規劃系統</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script>
+    tailwind.config = {
+        theme: {
+            extend: {
+                fontFamily: {
+                    'sans': ['Inter', 'system-ui', '-apple-system', 'sans-serif']
+                },
+                colors: {
+                    'primary': '#1E40AF',
+                    'success': '#10B981', 
+                    'warning': '#EF4444',
+                    'neutral': '#64748B'
+                }
+            }
+        }
+    };
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-50 font-sans">
+    <!-- @COMPONENT: Layout Container -->
+    <div class="flex h-screen overflow-hidden">
+        <!-- @COMPONENT: Sidebar Navigation -->
+        <aside class="w-64 bg-white shadow-lg">
+            <div class="p-6 border-b border-slate-200">
+                <h1 class="text-xl font-bold text-slate-800">
+                    <i class="fas fa-chart-line text-primary mr-2"></i>
+                    理財規劃系統
+                </h1>
+            </div>
+            <nav class="p-4">
+                <ul class="space-y-2">
+                    <li><a href="#dashboard" class="flex items-center p-3 rounded-lg bg-primary text-white">
+                        <i class="fas fa-tachometer-alt mr-3"></i>總覽儀表板
+                    </a></li>
+                    <li><a href="#income" class="flex items-center p-3 rounded-lg text-slate-600 hover:bg-slate-100">
+                        <i class="fas fa-coins mr-3"></i>收入管理
+                    </a></li>
+                    <li><a href="#expenses" class="flex items-center p-3 rounded-lg text-slate-600 hover:bg-slate-100">
+                        <i class="fas fa-credit-card mr-3"></i>支出管理
+                    </a></li>
+                    <li><a href="#analysis" class="flex items-center p-3 rounded-lg text-slate-600 hover:bg-slate-100">
+                        <i class="fas fa-chart-bar mr-3"></i>財務分析
+                    </a></li>
+                    <li><a href="#loan" class="flex items-center p-3 rounded-lg text-slate-600 hover:bg-slate-100">
+                        <i class="fas fa-home mr-3"></i>貸款評估
+                    </a></li>
+                </ul>
+            </nav>
+        </aside>
+        <!-- @END_COMPONENT: Sidebar Navigation -->
+
+        <!-- @COMPONENT: Main Content Area -->
+        <main class="flex-1 overflow-y-auto">
+            <!-- @COMPONENT: Header -->
+            <header class="bg-white shadow-sm border-b border-slate-200 p-6">
+                <div class="flex justify-between items-center">
+                    <h2 class="text-2xl font-semibold text-slate-800">財務總覽</h2>
+                    <div class="flex items-center space-x-4">
+                        <select class="border border-slate-300 rounded-lg px-3 py-2 text-sm" data-bind="selectedTimeRange">
+                            <option>本月</option>
+                            <option>最近3個月</option>
+                            <option>最近6個月</option>
+                            <option>本年度</option>
+                        </select>
+                        <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700">
+                            <i class="fas fa-plus mr-2"></i>新增資料
+                        </button>
+                    </div>
+                </div>
+            </header>
+            <!-- @END_COMPONENT: Header -->
+
+            <!-- @COMPONENT: Dashboard Content -->
+            <div class="p-6">
+                <!-- @COMPONENT: Financial Overview Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                    <div class="bg-white rounded-xl shadow-sm p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-slate-600 mb-1">總收入</p>
+                                <p class="text-2xl font-bold text-slate-800" data-bind="totalIncome">$85,000</p>
+                                <p class="text-xs text-success mt-1">
+                                    <i class="fas fa-arrow-up mr-1"></i>+12.5% 比上月
+                                </p>
+                            </div>
+                            <div class="p-3 bg-green-100 rounded-full">
+                                <i class="fas fa-arrow-trend-up text-success"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-slate-600 mb-1">總支出</p>
+                                <p class="text-2xl font-bold text-slate-800" data-bind="totalExpense">$52,000</p>
+                                <p class="text-xs text-warning mt-1">
+                                    <i class="fas fa-arrow-up mr-1"></i>+3.2% 比上月
+                                </p>
+                            </div>
+                            <div class="p-3 bg-red-100 rounded-full">
+                                <i class="fas fa-arrow-trend-down text-warning"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-slate-600 mb-1">淨收入</p>
+                                <p class="text-2xl font-bold text-slate-800" data-bind="netIncome">$33,000</p>
+                                <p class="text-xs text-success mt-1">
+                                    <i class="fas fa-arrow-up mr-1"></i>+18.7% 比上月
+                                </p>
+                            </div>
+                            <div class="p-3 bg-blue-100 rounded-full">
+                                <i class="fas fa-wallet text-primary"></i>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bg-white rounded-xl shadow-sm p-6">
+                        <div class="flex items-center justify-between">
+                            <div>
+                                <p class="text-sm text-slate-600 mb-1">儲蓄率</p>
+                                <p class="text-2xl font-bold text-slate-800" data-bind="savingsRate">38.8%</p>
+                                <p class="text-xs text-success mt-1">
+                                    <i class="fas fa-arrow-up mr-1"></i>目標: 30%
+                                </p>
+                            </div>
+                            <div class="p-3 bg-purple-100 rounded-full">
+                                <i class="fas fa-piggy-bank text-purple-600"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: Financial Overview Cards -->
+
+                <!-- @COMPONENT: Charts Row -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                    <!-- @COMPONENT: Income Trend Chart -->
+                    <div class="bg-white rounded-xl shadow-sm p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold text-slate-800">收入趨勢分析</h3>
+                            <div class="flex space-x-2">
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-green-100 text-success">
+                                    <i class="fas fa-circle mr-1" style="font-size: 6px;"></i>薪資收入
+                                </span>
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-blue-100 text-primary">
+                                    <i class="fas fa-circle mr-1" style="font-size: 6px;"></i>投資收入
+                                </span>
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs bg-yellow-100 text-yellow-600">
+                                    <i class="fas fa-circle mr-1" style="font-size: 6px;"></i>創業收入
+                                </span>
+                            </div>
+                        </div>
+                        <canvas id="incomeChart" width="400" height="300"></canvas>
+                        <!-- @FUNCTIONALITY: Chart should display time-based income data for the three categories -->
+                    </div>
+                    <!-- @END_COMPONENT: Income Trend Chart -->
+
+                    <!-- @COMPONENT: Expense Breakdown Chart -->
+                    <div class="bg-white rounded-xl shadow-sm p-6">
+                        <div class="flex items-center justify-between mb-6">
+                            <h3 class="text-lg font-semibold text-slate-800">支出分布</h3>
+                            <select class="border border-slate-300 rounded-lg px-3 py-2 text-sm">
+                                <option>本月</option>
+                                <option>上月</option>
+                                <option>本季</option>
+                            </select>
+                        </div>
+                        <canvas id="expenseChart" width="400" height="300"></canvas>
+                        <!-- @FUNCTIONALITY: Pie chart showing expense categories breakdown -->
+                    </div>
+                    <!-- @END_COMPONENT: Expense Breakdown Chart -->
+                </div>
+                <!-- @END_COMPONENT: Charts Row -->
+
+                <!-- @COMPONENT: Income Modules Section -->
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-semibold text-slate-800">收入模塊管理</h3>
+                        <button class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700" data-event="click:openIncomeModal">
+                            <i class="fas fa-plus mr-2"></i>新增收入記錄
+                        </button>
+                    </div>
+
+                    <!-- @COMPONENT: Income Modules Tabs -->
+                    <div class="border-b border-slate-200 mb-6">
+                        <nav class="-mb-px flex space-x-8">
+                            <a href="#" class="border-primary text-primary border-b-2 font-medium text-sm py-2 px-1">
+                                薪資收入
+                            </a>
+                            <a href="#" class="border-transparent text-slate-500 hover:text-slate-700 border-b-2 font-medium text-sm py-2 px-1">
+                                投資收入
+                            </a>
+                            <a href="#" class="border-transparent text-slate-500 hover:text-slate-700 border-b-2 font-medium text-sm py-2 px-1">
+                                創業收入
+                            </a>
+                        </nav>
+                    </div>
+                    <!-- @END_COMPONENT: Income Modules Tabs -->
+
+                    <!-- @COMPONENT: Salary Income Module -->
+                    <div id="salaryModule">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            <!-- @MAP: salaryIncomeItems.map(item => ( -->
+                            <div class="p-4 border border-slate-200 rounded-lg hover:border-slate-300 transition-colors">
+                                <div class="flex justify-between items-start mb-3">
+                                    <div class="flex-1">
+                                        <h4 class="font-medium text-slate-800" data-bind="item.type">基本月薪</h4>
+                                        <p class="text-2xl font-bold text-success mt-1" data-bind="item.amount">$45,000</p>
+                                        <p class="text-xs text-slate-500 mt-1" data-bind="item.date">2024年3月</p>
+                                    </div>
+                                    <div class="flex space-x-1">
+                                        <button class="p-1 text-slate-400 hover:text-primary" data-event="click:editItem">
+                                            <i class="fas fa-edit text-sm"></i>
+                                        </button>
+                                        <button class="p-1 text-slate-400 hover:text-warning" data-event="click:deleteItem">
+                                            <i class="fas fa-trash text-sm"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="space-y-2">
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-slate-600">年終獎金</span>
+                                        <span class="font-medium" data-bind="item.bonus">$50,000</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-slate-600">加班費</span>
+                                        <span class="font-medium" data-bind="item.overtime">$5,200</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm">
+                                        <span class="text-slate-600">津貼補助</span>
+                                        <span class="font-medium" data-bind="item.allowance">$3,800</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <!-- @END_MAP )) -->
+
+                            <!-- Add Income Card -->
+                            <div class="p-4 border-2 border-dashed border-slate-300 rounded-lg flex flex-col items-center justify-center text-slate-500 hover:border-primary hover:text-primary transition-colors cursor-pointer" data-event="click:addSalaryItem">
+                                <i class="fas fa-plus text-2xl mb-2"></i>
+                                <span class="text-sm font-medium">新增薪資收入</span>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- @END_COMPONENT: Salary Income Module -->
+                </div>
+                <!-- @END_COMPONENT: Income Modules Section -->
+
+                <!-- @COMPONENT: Expense Tracking Section -->
+                <div class="bg-white rounded-xl shadow-sm p-6 mb-8">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="text-xl font-semibold text-slate-800">支出追蹤</h3>
+                        <button class="bg-warning text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-600" data-event="click:openExpenseModal">
+                            <i class="fas fa-plus mr-2"></i>新增支出記錄
+                        </button>
+                    </div>
+
+                    <!-- @COMPONENT: Expense Categories Grid -->
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- @MAP: expenseCategories.map(category => ( -->
+                        <div class="p-4 border border-slate-200 rounded-lg">
+                            <div class="flex items-center mb-3">
+                                <div class="p-2 bg-red-100 rounded-lg mr-3">
+                                    <i class="fas fa-utensils text-warning" data-bind="category.icon"></i>
+                                </div>
+                                <div class="flex-1">
+                                    <h4 class="font-medium text-slate-800" data-bind="category.name">生活費用</h4>
+                                    <p class="text-sm text-slate-500" data-bind="category.count">15 筆交易</p>
+                                </div>
+                            </div>
+                            <div class="space-y-2">
+                                <div class="flex justify-between">
+                                    <span class="text-sm text-slate-600">本月支出</span>
+                                    <span class="font-bold text-warning" data-bind="category.amount">$18,500</span>
+                                </div>
+                                <div class="w-full bg-slate-200 rounded-full h-2">
+                                    <div class="bg-warning h-2 rounded-full" style="width: 65%" data-bind="category.progress"></div>
+                                </div>
+                                <div class="flex justify-between text-xs text-slate-500">
+                                    <span>預算: $25,000</span>
+                                    <span>剩餘: $6,500</span>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- @END_MAP )) -->
+                    </div>
+                    <!-- @END_COMPONENT: Expense Categories Grid -->
+                </div>
+                <!-- @END_COMPONENT: Expense Tracking Section -->
+
+                <!-- @COMPONENT: Loan Assessment Section -->
+                <div class="bg-white rounded-xl shadow-sm p-6">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-6">貸款能力評估</h3>
+                    
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <!-- @COMPONENT: Loan Calculator -->
+                        <div>
+                            <h4 class="text-lg font-medium text-slate-800 mb-4">房貸試算</h4>
+                            <div class="space-y-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">房屋總價</label>
+                                    <input type="text" placeholder="NT$ 8,000,000" class="w-full border border-slate-300 rounded-lg px-4 py-3" data-bind="loanAmount" />
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">頭期款</label>
+                                    <input type="text" placeholder="NT$ 2,000,000" class="w-full border border-slate-300 rounded-lg px-4 py-3" data-bind="downPayment" />
+                                </div>
+                                <div class="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-2">貸款年限</label>
+                                        <select class="w-full border border-slate-300 rounded-lg px-4 py-3" data-bind="loanTerm">
+                                            <option>20年</option>
+                                            <option>25年</option>
+                                            <option selected>30年</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-2">利率 (%)</label>
+                                        <input type="text" placeholder="2.1" class="w-full border border-slate-300 rounded-lg px-4 py-3" data-bind="interestRate" />
+                                    </div>
+                                </div>
+                                <button class="w-full bg-primary text-white py-3 rounded-lg font-medium hover:bg-blue-700" data-event="click:calculateLoan">
+                                    計算貸款能力
+                                </button>
+                            </div>
+                        </div>
+                        <!-- @END_COMPONENT: Loan Calculator -->
+
+                        <!-- @COMPONENT: Loan Assessment Results -->
+                        <div>
+                            <h4 class="text-lg font-medium text-slate-800 mb-4">評估結果</h4>
+                            <div class="space-y-4">
+                                <div class="p-4 bg-slate-50 rounded-lg">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-sm text-slate-600">每月應繳金額</span>
+                                        <span class="text-xl font-bold text-slate-800" data-bind="monthlyPayment">$25,847</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm text-slate-600">
+                                        <span>本金</span>
+                                        <span data-bind="principalPayment">$9,514</span>
+                                    </div>
+                                    <div class="flex justify-between text-sm text-slate-600">
+                                        <span>利息</span>
+                                        <span data-bind="interestPayment">$16,333</span>
+                                    </div>
+                                </div>
+
+                                <div class="p-4 border border-slate-200 rounded-lg">
+                                    <h5 class="font-medium text-slate-800 mb-3">財務健康度指標</h5>
+                                    <div class="space-y-3">
+                                        <div>
+                                            <div class="flex justify-between text-sm mb-1">
+                                                <span>負債收入比</span>
+                                                <span class="font-medium text-success" data-bind="debtRatio">30.4%</span>
+                                            </div>
+                                            <div class="w-full bg-slate-200 rounded-full h-2">
+                                                <div class="bg-success h-2 rounded-full" style="width: 30%"></div>
+                                            </div>
+                                            <p class="text-xs text-slate-500 mt-1">健康範圍: < 40%</p>
+                                        </div>
+
+                                        <div>
+                                            <div class="flex justify-between text-sm mb-1">
+                                                <span>房貸收入比</span>
+                                                <span class="font-medium text-success" data-bind="mortgageRatio">28.7%</span>
+                                            </div>
+                                            <div class="w-full bg-slate-200 rounded-full h-2">
+                                                <div class="bg-success h-2 rounded-full" style="width: 29%"></div>
+                                            </div>
+                                            <p class="text-xs text-slate-500 mt-1">建議範圍: < 30%</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="p-4 bg-green-50 border border-green-200 rounded-lg">
+                                    <div class="flex items-center">
+                                        <i class="fas fa-check-circle text-success mr-2"></i>
+                                        <span class="text-sm font-medium text-success">符合貸款條件</span>
+                                    </div>
+                                    <p class="text-xs text-green-600 mt-1">
+                                        根據您的收入狀況，可負擔此房貸金額
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- @END_COMPONENT: Loan Assessment Results -->
+                    </div>
+                </div>
+                <!-- @END_COMPONENT: Loan Assessment Section -->
+            </div>
+            <!-- @END_COMPONENT: Dashboard Content -->
+        </main>
+        <!-- @END_COMPONENT: Main Content Area -->
+    </div>
+    <!-- @END_COMPONENT: Layout Container -->
+
+    <!-- @COMPONENT: Add Income Modal -->
+    <div id="incomeModal" class="fixed inset-0 bg-black bg-opacity-50 hidden z-50" data-implementation="Modal should be controlled by state">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="bg-white rounded-xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+                <div class="p-6 border-b border-slate-200">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xl font-semibold text-slate-800">新增收入記錄</h3>
+                        <button class="p-2 text-slate-400 hover:text-slate-600" data-event="click:closeModal">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                </div>
+                <form class="p-6 space-y-6" data-event="submit:submitIncomeForm">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">收入類型</label>
+                            <select class="w-full border border-slate-300 rounded-lg px-4 py-3" data-bind="incomeType">
+                                <option>薪資收入</option>
+                                <option>投資收入</option>
+                                <option>創業收入</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">收入項目</label>
+                            <select class="w-full border border-slate-300 rounded-lg px-4 py-3" data-bind="incomeItem">
+                                <option>基本月薪</option>
+                                <option>年終獎金</option>
+                                <option>加班費</option>
+                                <option>津貼補助</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">金額</label>
+                            <input type="number" placeholder="輸入金額" class="w-full border border-slate-300 rounded-lg px-4 py-3" data-bind="amount" />
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-slate-700 mb-2">日期</label>
+                            <input type="date" class="w-full border border-slate-300 rounded-lg px-4 py-3" data-bind="date" />
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-slate-700 mb-2">備註</label>
+                        <textarea rows="3" placeholder="輸入備註..." class="w-full border border-slate-300 rounded-lg px-4 py-3" data-bind="notes"></textarea>
+                    </div>
+                    <div class="flex justify-end space-x-3 pt-4 border-t border-slate-200">
+                        <button type="button" class="px-6 py-2 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-50" data-event="click:closeModal">
+                            取消
+                        </button>
+                        <button type="submit" class="px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-700">
+                            儲存
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <!-- @END_COMPONENT: Add Income Modal -->
+
+    <script>
+        // Chart initialization - TODO: Replace with real data from API
+        (function() {
+            // Income trend chart
+            const incomeCtx = document.getElementById('incomeChart');
+            if (incomeCtx) {
+                new Chart(incomeCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['1月', '2月', '3月', '4月', '5月', '6月'],
+                        datasets: [{
+                            label: '薪資收入',
+                            data: [45000, 45000, 47000, 45000, 48000, 45000],
+                            borderColor: '#10B981',
+                            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                            tension: 0.4
+                        }, {
+                            label: '投資收入',
+                            data: [8000, 12000, 15000, 18000, 22000, 25000],
+                            borderColor: '#1E40AF',
+                            backgroundColor: 'rgba(30, 64, 175, 0.1)',
+                            tension: 0.4
+                        }, {
+                            label: '創業收入',
+                            data: [5000, 8000, 12000, 15000, 18000, 15000],
+                            borderColor: '#F59E0B',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                display: false
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: '#F1F5F9'
+                                }
+                            },
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // Expense breakdown chart
+            const expenseCtx = document.getElementById('expenseChart');
+            if (expenseCtx) {
+                new Chart(expenseCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['生活費用', '貸款支出', '保險費用', '投資支出', '娛樂支出', '其他支出'],
+                        datasets: [{
+                            data: [18500, 15000, 8500, 5000, 3000, 2000],
+                            backgroundColor: [
+                                '#EF4444',
+                                '#F59E0B',
+                                '#10B981',
+                                '#1E40AF',
+                                '#8B5CF6',
+                                '#6B7280'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    usePointStyle: true
+                                }
+                            }
+                        }
+                    }
+                });
+            }
+        })();
+
+        // Modal controls - TODO: Implement proper state management
+        (function() {
+            const modal = document.getElementById('incomeModal');
+            const openButtons = document.querySelectorAll('[data-event*="openIncomeModal"], [data-event*="addSalaryItem"]');
+            const closeButtons = document.querySelectorAll('[data-event*="closeModal"]');
+
+            openButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    modal.classList.remove('hidden');
+                });
+            });
+
+            closeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    modal.classList.add('hidden');
+                });
+            });
+
+            // Close on backdrop click
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.add('hidden');
+                }
+            });
+        })();
+
+        // Form submission handlers - TODO: Implement API integration
+        document.addEventListener('submit', function(e) {
+            if (e.target.matches('[data-event*="submit"]')) {
+                e.preventDefault();
+                console.log('Form submitted - TODO: Implement API call');
+                // TODO: Add form validation and API integration
+            }
+        });
+
+        // Tab switching - TODO: Implement proper component state
+        document.querySelectorAll('nav a[href="#"]').forEach(tab => {
+            tab.addEventListener('click', function(e) {
+                e.preventDefault();
+                // Remove active class from all tabs
+                document.querySelectorAll('nav a').forEach(t => {
+                    t.className = t.className.replace('border-primary text-primary', 'border-transparent text-slate-500 hover:text-slate-700');
+                });
+                // Add active class to clicked tab
+                this.className = this.className.replace('border-transparent text-slate-500 hover:text-slate-700', 'border-primary text-primary');
+                
+                // TODO: Show/hide corresponding content panels
+            });
+        });
+    </script>
+</body>
+</html>
