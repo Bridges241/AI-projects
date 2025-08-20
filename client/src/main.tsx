@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import { BrowserRouter } from "react-router-dom";
+import { Router as WouterRouter } from "wouter";
 import App from "./App";
 import "./index.css";
 
